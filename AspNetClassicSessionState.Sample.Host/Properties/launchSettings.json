@@ -1,0 +1,8 @@
+{
+    "profiles": {
+        "AspNetClassicSessionState.Sample.Host": {
+            "commandName": "Project",
+            "nativeDebugging": true
+        }
+    }
+}

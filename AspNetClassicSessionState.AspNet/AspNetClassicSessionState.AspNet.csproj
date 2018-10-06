@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net47</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Jerome Haltom</Authors>
+        <Description>ASP.Net components for proxying ASP Classic Session State to ASP.Net. These components require a COM object be made available and configured within Classic ASP.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="build\AspNetClassicSessionState.AspNet.props" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <COMReference Include="ASPTypeLibrary.dll">
+        <Guid>d97a6da0-a85c-11cf-83ae-00a0c90c2bd8</Guid>
+        <VersionMajor>3</VersionMajor>
+        <VersionMinor>0</VersionMinor>
+        <WrapperTool>tlbimp</WrapperTool>
+        <Lcid>0</Lcid>
+        <Isolated>false</Isolated>
+      </COMReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="build\AspNetClassicSessionState.AspNet.props">
+          <Pack>true</Pack>
+          <PackageCopyToOutput>true</PackageCopyToOutput>
+          <PackagePath>build</PackagePath>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="WebActivatorEx" Version="2.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\AspNetClassicSessionState.Managed\AspNetClassicSessionState.Managed.csproj">
+            <IncludeAssets>all</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <TreatAsPackageReference>false</TreatAsPackageReference>
+            <OutputItemType>Content</OutputItemType>
+            <PackageCopyToOutput>false</PackageCopyToOutput>
+            <PackagePath>include</PackagePath>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+        <ProjectReference Include="..\AspNetClassicSessionState.Asp\AspNetClassicSessionState.Asp.vcxproj">
+            <IncludeAssets>all</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <TreatAsPackageReference>false</TreatAsPackageReference>
+            <OutputItemType>Content</OutputItemType>
+            <PackageCopyToOutput>false</PackageCopyToOutput>
+            <PackagePath>include</PackagePath>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="System.Configuration" />
+      <Reference Include="System.EnterpriseServices" />
+      <Reference Include="System.Web" />
+    </ItemGroup>
+
+</Project>

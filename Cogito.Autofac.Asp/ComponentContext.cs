@@ -175,7 +175,11 @@ namespace Cogito.Autofac.Asp
         /// <returns></returns>
         object ResolveFunc(Func<ComponentContextProxy, IntPtr> resolve)
         {
-            return ResolveWithProxyFunc(GetProxy(), resolve);
+            var proxy = GetProxy();
+            if (proxy == null)
+                throw new InvalidOperationException("Unable to resolve Autofac COM request proxy. Ensure the Cogito.Autofac.Asp project is installed within the ASP.Net site, and that Autofac.Web has been configured properly with an HttpApplication instance that implements IContainerProviderAccessor.");
+
+            return ResolveWithProxyFunc(proxy, resolve);
         }
 
         /// <summary>
@@ -185,7 +189,11 @@ namespace Cogito.Autofac.Asp
         /// <returns></returns>
         object ResolveApplicationFunc(Func<ComponentContextProxy, IntPtr> resolve)
         {
-            return ResolveWithProxyFunc(GetApplicationProxy(), resolve);
+            var proxy = GetApplicationProxy();
+            if (proxy == null)
+                throw new InvalidOperationException("Unable to resolve Autofac COM application proxy. Ensure the Cogito.Autofac.Asp project is installed within the ASP.Net site, and that Autofac.Web has been configured properly with an HttpApplication instance that implements IContainerProviderAccessor.");
+
+            return ResolveWithProxyFunc(proxy, resolve);
         }
 
         /// <summary>

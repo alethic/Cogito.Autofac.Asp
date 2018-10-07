@@ -111,7 +111,7 @@ namespace Cogito.Autofac.Asp
 
             var scope = context();
             if (scope == null)
-                throw new InvalidOperationException("Could not resolve Autofac component context.");
+                throw new InvalidOperationException("Could not resolve Autofac component context. Ensure Autofac.Web has been configured and that your HttpAppliation instance implements IContainerProviderAccessor.");
 
             var service = resolve(scope, serviceType);
             if (service == null)

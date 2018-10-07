@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 
 using Autofac;
+using Autofac.Features.OwnedInstances;
 
 namespace Cogito.Autofac.Asp
 {
@@ -27,61 +28,74 @@ namespace Cogito.Autofac.Asp
         }
 
         /// <summary>
-        /// Resolves the type with the specified name from the container.
+        /// Retrieve a service from container.
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
         public IntPtr Resolve(string serviceTypeName)
         {
-            var serviceType = Type.GetType(serviceTypeName);
-            if (serviceType == null)
-                throw new TypeLoadException($"Unable to locate '{serviceTypeName}'.");
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
 
-            var scope = context();
-            if (scope == null)
-                throw new InvalidOperationException("Could not resolve Autofac component context.");
-
-            // resolve through component context
-            var service = scope.Resolve(serviceType);
-            if (service == null)
-                return IntPtr.Zero;
-
-            // pointer to IUnknown on CCW
-            return Marshal.GetIUnknownForObject(service);
+            return ResolveFunc(serviceTypeName, (ctx, serviceType) =>
+                ctx.Resolve(serviceType));
         }
 
         /// <summary>
-        /// Resolves the type with the specified name from the container.
+        /// Retrieve an optional service from container.
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
         public IntPtr ResolveOptional(string serviceTypeName)
         {
-            var serviceType = Type.GetType(serviceTypeName);
-            if (serviceType == null)
-                throw new TypeLoadException($"Unable to locate '{serviceTypeName}'.");
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
 
-            var scope = context();
-            if (scope == null)
-                throw new InvalidOperationException("Could not resolve Autofac component context.");
-
-            // resolve through component context
-            var service = scope.ResolveOptional(serviceType);
-            if (service == null)
-                return IntPtr.Zero;
-
-            // pointer to IUnknown on CCW
-            return Marshal.GetIUnknownForObject(service);
+            return ResolveFunc(serviceTypeName, (ctx, serviceType) =>
+                ctx.ResolveOptional(serviceType));
         }
 
         /// <summary>
-        /// Retrieve a named service from the request context.
+        /// Retrieve a named service from container.
         /// </summary>
         /// <param name="serviceName"></param>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
         public IntPtr ResolveNamed(string serviceName, string serviceTypeName)
         {
+            if (serviceName == null)
+                throw new ArgumentNullException(nameof(serviceName));
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
+
+            return ResolveFunc(serviceTypeName, (ctx, serviceType) =>
+                ctx.ResolveNamed(serviceName, serviceType));
+        }
+
+        /// <summary>
+        /// Retrieve an owned service from the request context.
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <param name="serviceTypeName"></param>
+        /// <returns></returns>
+        public IntPtr ResolveOwned(string serviceTypeName)
+        {
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
+
+            return ResolveFunc(serviceTypeName, (ctx, serviceType) =>
+                ctx.Resolve(typeof(Owned<>).MakeGenericType(serviceType)));
+        }
+
+        /// <summary>
+        /// Internal method to resolve the service with the specified type using the specified resolution method.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serviceTypeName"></param>
+        /// <param name="resolve"></param>
+        /// <returns></returns>
+        IntPtr ResolveFunc(string serviceTypeName, Func<IComponentContext, Type, object> resolve)
+        {
             var serviceType = Type.GetType(serviceTypeName);
             if (serviceType == null)
                 throw new TypeLoadException($"Unable to locate '{serviceTypeName}'.");
@@ -90,7 +104,7 @@ namespace Cogito.Autofac.Asp
             if (scope == null)
                 throw new InvalidOperationException("Could not resolve Autofac component context.");
 
-            var service = scope.ResolveNamed(serviceName, serviceType);
+            var service = resolve(scope, serviceType);
             if (service == null)
                 return IntPtr.Zero;
 

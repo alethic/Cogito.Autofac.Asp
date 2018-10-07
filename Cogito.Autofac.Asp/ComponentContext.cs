@@ -40,15 +40,7 @@ namespace Cogito.Autofac.Asp
             if (serviceTypeName == null)
                 throw new ArgumentNullException(nameof(serviceTypeName));
 
-            var ptr = GetProxy().Resolve(serviceTypeName);
-            if (ptr == IntPtr.Zero)
-                return null;
-
-            // resolve to RCW, which .Net can marshal correctly
-            var obj = Marshal.GetObjectForIUnknown(ptr);
-            Marshal.Release(ptr);
-
-            return obj;
+            return ResolveFunc(proxy => proxy.Resolve(serviceTypeName));
         }
 
         /// <summary>
@@ -62,15 +54,7 @@ namespace Cogito.Autofac.Asp
             if (serviceTypeName == null)
                 throw new ArgumentNullException(nameof(serviceTypeName));
 
-            var ptr = GetProxy().ResolveOptional(serviceTypeName);
-            if (ptr == IntPtr.Zero)
-                return null;
-
-            // resolve to RCW, which .Net can marshal correctly
-            var obj = Marshal.GetObjectForIUnknown(ptr);
-            Marshal.Release(ptr);
-
-            return obj;
+            return ResolveFunc(proxy => proxy.ResolveOptional(serviceTypeName));
         }
 
         /// <summary>
@@ -82,64 +66,40 @@ namespace Cogito.Autofac.Asp
         [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveNamed(string serviceName, string serviceTypeName)
         {
-            if (serviceTypeName == null)
-                throw new ArgumentNullException(nameof(serviceTypeName));
             if (serviceName == null)
                 throw new ArgumentNullException(nameof(serviceName));
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
 
-            var ptr = GetProxy().ResolveNamed(serviceName, serviceTypeName);
-            if (ptr == IntPtr.Zero)
-                return null;
-
-            // resolve to RCW, which .Net can marshal correctly
-            var obj = Marshal.GetObjectForIUnknown(ptr);
-            Marshal.Release(ptr);
-
-            return obj;
+            return ResolveFunc(proxy => proxy.ResolveNamed(serviceName, serviceTypeName));
         }
 
         /// <summary>
         /// Resolves an object from the root container.
         /// </summary>
-        /// <param name="typeName"></param>
+        /// <param name="serviceTypeName"></param>
         /// <returns></returns>
         [return: MarshalAs(UnmanagedType.IUnknown)]
-        public object ResolveApplication(string typeName)
+        public object ResolveApplication(string serviceTypeName)
         {
-            if (typeName == null)
-                throw new ArgumentNullException(nameof(typeName));
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
 
-            var ptr = GetApplicationProxy().Resolve(typeName);
-            if (ptr == IntPtr.Zero)
-                return null;
-
-            // resolve to RCW, which .Net can marshal correctly
-            var obj = Marshal.GetObjectForIUnknown(ptr);
-            Marshal.Release(ptr);
-
-            return obj;
+            return ResolveApplicationFunc(proxy => proxy.Resolve(serviceTypeName));
         }
 
         /// <summary>
         /// Resolves an object from the root container.
         /// </summary>
-        /// <param name="typeName"></param>
+        /// <param name="serviceTypeName"></param>
         /// <returns></returns>
         [return: MarshalAs(UnmanagedType.IUnknown)]
-        public object ResolveApplicationOptional(string typeName)
+        public object ResolveApplicationOptional(string serviceTypeName)
         {
-            if (typeName == null)
-                throw new ArgumentNullException(nameof(typeName));
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
 
-            var ptr = GetApplicationProxy().ResolveOptional(typeName);
-            if (ptr == IntPtr.Zero)
-                return null;
-
-            // resolve to RCW, which .Net can marshal correctly
-            var obj = Marshal.GetObjectForIUnknown(ptr);
-            Marshal.Release(ptr);
-
-            return obj;
+            return ResolveApplicationFunc(proxy => proxy.ResolveOptional(serviceTypeName));
         }
 
         /// <summary>
@@ -150,12 +110,26 @@ namespace Cogito.Autofac.Asp
         [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveApplicationNamed(string serviceName, string serviceTypeName)
         {
-            if (serviceName == null)
-                throw new ArgumentNullException(nameof(serviceName));
             if (serviceTypeName == null)
                 throw new ArgumentNullException(nameof(serviceTypeName));
 
-            var ptr = GetApplicationProxy().ResolveNamed(serviceName, serviceTypeName);
+            return ResolveApplicationFunc(proxy => proxy.ResolveNamed(serviceName, serviceTypeName));
+        }
+
+        /// <summary>
+        /// Shared implementation of resolution against the proxy.
+        /// </summary>
+        /// <param name="serviceTypeName"></param>
+        /// <param name="resolve"></param>
+        /// <returns></returns>
+        object ResolveWithProxyFunc(ComponentContextProxy proxy, Func<ComponentContextProxy, IntPtr> resolve)
+        {
+            if (proxy == null)
+                throw new ArgumentNullException(nameof(proxy));
+            if (resolve == null)
+                throw new ArgumentNullException(nameof(resolve));
+
+            var ptr = resolve(proxy);
             if (ptr == IntPtr.Zero)
                 return null;
 
@@ -164,6 +138,16 @@ namespace Cogito.Autofac.Asp
             Marshal.Release(ptr);
 
             return obj;
+        }
+
+        object ResolveFunc(Func<ComponentContextProxy, IntPtr> resolve)
+        {
+            return ResolveWithProxyFunc(GetProxy(), resolve);
+        }
+
+        object ResolveApplicationFunc(Func<ComponentContextProxy, IntPtr> resolve)
+        {
+            return ResolveWithProxyFunc(GetApplicationProxy(), resolve);
         }
 
         /// <summary>

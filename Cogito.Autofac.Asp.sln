@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.vsts-ci.yml = .vsts-ci.yml
+		appveyor.yml = appveyor.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cogito.Autofac.Asp.Sample", "Cogito.Autofac.Asp.Sample\Cogito.Autofac.Asp.Sample.csproj", "{342A58D5-CB4F-490D-9256-BCB6D0C48B0C}"

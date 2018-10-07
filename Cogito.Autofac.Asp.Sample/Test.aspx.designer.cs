@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplication3
+namespace Cogito.Autofac.Asp.Sample
 {
 
 
-    public partial class _default
+    public partial class Test
     {
 
         /// <summary>

@@ -1,0 +1,15 @@
+﻿<object runat="server" scope="Application" id="ComponentContext" progid="Cogito.Autofac.Asp.ComponentContext"></object>
+
+Sub Application_OnStart
+    Dim obj
+    Set obj = ComponentContext.ResolveApplication("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject, Cogito.Autofac.Asp.Sample.Objects")
+    Dim val
+    val = obj.Text
+End Sub
+
+Sub Application_OnStop
+    Dim obj
+    Set obj = ComponentContext.ResolveApplication("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject, Cogito.Autofac.Asp.Sample.Objects")
+    Dim val
+    val = obj.Text
+End Sub

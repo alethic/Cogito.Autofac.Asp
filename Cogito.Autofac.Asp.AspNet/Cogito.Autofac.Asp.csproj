@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net47</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <EnableComExport>true</EnableComExport>
+        <Authors>Jerome Haltom</Authors>
+        <Description>ASP.Net components for proxying ASP Classic Session State to ASP.Net. These components require a COM object be made available and configured within Classic ASP.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <COMReference Include="mscoree.dll">
+        <Guid>5477469e-83b1-11d2-8b49-00a0c9b7c9c4</Guid>
+        <VersionMajor>2</VersionMajor>
+        <VersionMinor>4</VersionMinor>
+        <WrapperTool>tlbimp</WrapperTool>
+        <Lcid>0</Lcid>
+        <Isolated>false</Isolated>
+      </COMReference>
+      <COMReference Include="ASPTypeLibrary.dll">
+        <Guid>d97a6da0-a85c-11cf-83ae-00a0c90c2bd8</Guid>
+        <VersionMajor>3</VersionMajor>
+        <VersionMinor>0</VersionMinor>
+        <WrapperTool>tlbimp</WrapperTool>
+        <Lcid>0</Lcid>
+        <Isolated>false</Isolated>
+      </COMReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Autofac" Version="4.8.1" />
+      <PackageReference Include="Autofac.Web" Version="4.0.0" />
+      <PackageReference Include="Cogito.Core" Version="2.0.0" />
+      <PackageReference Include="FileAndServe.MSBuild.COM" Version="0.1.0-unstable0069" />
+      <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
+      <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
+      <PackageReference Include="WebActivatorEx" Version="2.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="System.Configuration" />
+      <Reference Include="System.EnterpriseServices" />
+      <Reference Include="System.Web" />
+    </ItemGroup>
+
+</Project>

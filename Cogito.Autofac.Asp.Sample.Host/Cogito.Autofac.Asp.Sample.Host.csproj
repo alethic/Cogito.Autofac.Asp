@@ -4,7 +4,9 @@
     <TargetFramework>net47</TargetFramework>
     <OutputType>Exe</OutputType>
     <EnableCOMImport>true</EnableCOMImport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon />
+    <StartupObject>Cogito.Autofac.Asp.Sample.Host.Program</StartupObject>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -28,20 +30,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cogito.HostedWebCore" Version="1.1.0-unstable0014" />
+    <PackageReference Include="Cogito.HostedWebCore" Version="1.1.0" />
     <PackageReference Include="FileAndServe.MSBuild.COM" Version="0.1.0-unstable0069" />
     <PackageReference Include="FileAndServe.MSBuild.WebImport" Version="0.1.0-unstable0069" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspNetClassicSessionState.AspNet\AspNetClassicSessionState.AspNet.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\AspNetClassicSessionState.Asp\AspNetClassicSessionState.Asp.vcxproj" />
-    <ProjectReference Include="..\AspNetClassicSessionState.Managed\AspNetClassicSessionState.Managed.csproj" />
-    <ProjectReference Include="..\AspNetClassicSessionState.Sample\AspNetClassicSessionState.Sample.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\Cogito.Autofac.Asp.AspNet\Cogito.Autofac.Asp.csproj" />
   </ItemGroup>
 
 </Project>

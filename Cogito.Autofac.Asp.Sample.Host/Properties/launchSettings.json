@@ -1,6 +1,6 @@
 {
     "profiles": {
-        "AspNetClassicSessionState.Sample.Host": {
+        "Cogito.Autofac.Asp.Sample.Host": {
             "commandName": "Project",
             "nativeDebugging": true
         }

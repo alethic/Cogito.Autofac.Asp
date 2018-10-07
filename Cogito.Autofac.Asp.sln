@@ -9,13 +9,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.vsts-ci.yml = .vsts-ci.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cogito.Autofac.Asp", "Cogito.Autofac.Asp.AspNet\Cogito.Autofac.Asp.csproj", "{E85532B5-10A8-4E77-918A-3D17C680BE13}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cogito.Autofac.Asp.Sample", "Cogito.Autofac.Asp.Sample\Cogito.Autofac.Asp.Sample.csproj", "{342A58D5-CB4F-490D-9256-BCB6D0C48B0C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cogito.Autofac.Asp.Sample.Host", "Cogito.Autofac.Asp.Sample.Host\Cogito.Autofac.Asp.Sample.Host.csproj", "{B5672C5B-40F3-442F-8F98-C111595103FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cogito.Autofac.Asp.Sample.Objects", "Cogito.Autofac.Asp.Sample.Objects\Cogito.Autofac.Asp.Sample.Objects.csproj", "{5F7B1D9A-4F77-4BAA-B97F-0243E80CD4D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cogito.Autofac.Asp", "Cogito.Autofac.Asp\Cogito.Autofac.Asp.csproj", "{894CCCEB-52E1-4505-A8BA-E9AE6704E5CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E85532B5-10A8-4E77-918A-3D17C680BE13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E85532B5-10A8-4E77-918A-3D17C680BE13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E85532B5-10A8-4E77-918A-3D17C680BE13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E85532B5-10A8-4E77-918A-3D17C680BE13}.Release|Any CPU.Build.0 = Release|Any CPU
 		{342A58D5-CB4F-490D-9256-BCB6D0C48B0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{342A58D5-CB4F-490D-9256-BCB6D0C48B0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{342A58D5-CB4F-490D-9256-BCB6D0C48B0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +35,10 @@ Global
 		{5F7B1D9A-4F77-4BAA-B97F-0243E80CD4D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F7B1D9A-4F77-4BAA-B97F-0243E80CD4D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F7B1D9A-4F77-4BAA-B97F-0243E80CD4D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{894CCCEB-52E1-4505-A8BA-E9AE6704E5CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{894CCCEB-52E1-4505-A8BA-E9AE6704E5CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{894CCCEB-52E1-4505-A8BA-E9AE6704E5CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{894CCCEB-52E1-4505-A8BA-E9AE6704E5CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

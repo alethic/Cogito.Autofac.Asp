@@ -106,13 +106,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cogito.Autofac.Asp.AspNet\Cogito.Autofac.Asp.csproj">
-      <Project>{e85532b5-10a8-4e77-918a-3d17c680be13}</Project>
-      <Name>Cogito.Autofac.Asp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cogito.Autofac.Asp.Sample.Objects\Cogito.Autofac.Asp.Sample.Objects.csproj">
       <Project>{5F7B1D9A-4F77-4BAA-B97F-0243E80CD4D1}</Project>
       <Name>Cogito.Autofac.Asp.Sample.Objects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cogito.Autofac.Asp\Cogito.Autofac.Asp.csproj">
+      <Project>{894ccceb-52e1-4505-a8ba-e9ae6704e5ce}</Project>
+      <Name>Cogito.Autofac.Asp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

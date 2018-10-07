@@ -3,7 +3,7 @@ Provides the capability to resolve Autofac instances from Classic ASP
 
 This project allows code from classic ASP (VBScript) to resolve instances to objects within the Autofac request lifetime scope.
 
-This is done by initializing the `Cogito.Autofac.Asp.ComponentContext` object within ASP. This object then provides two methods: `Resolve` and `ResolveApplication`. The former will resolve from the lifetime scope for the current request. The latter from the default application container.
+This is done by initializing the `Cogito.Autofac.Asp.ComponentContext` object within ASP. This object then provides two methods: `Resolve` and `ResolveApplication`. The former will resolve from the lifetime scope for the current request. The latter from the default application container. Both accept the .NET type name to resolve as a string. Obviously, no generics.
 
 The mechanism behind this is a little risky. The managed pipeline in IIS must be used. And the `HttpApplication` must provide a `IContainerProviderAccessor` implementation, as required by the Autofac.Web project. An ASP.Net `HttpModule` is registered. Upon init, it places an `ObjRef` to a proxy object within the default `AppDomain`'s data structure. This is done using the Common Language Runtime Execution Engine library. This `ObjRef` provides remoting from the default process `AppDomain` to the `AppDomain` in which the ASP.Net site is actually hosted. Second, at the beginning of each request, this module places a similar serialized and compressed `ObjRef` into the COM+ `Request` object's `ServerVariables`. This is accessible from a thread entering the COM component originating from classic ASP.
 

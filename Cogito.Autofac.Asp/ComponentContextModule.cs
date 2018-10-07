@@ -106,7 +106,7 @@ namespace Cogito.Autofac.Asp
             // clear reference to this application in the default app domain
             new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
             if (adv is AppDomain ad && ad.IsDefaultAppDomain())
-                ad.SetData($"__COMCTXPROXYMODREF_{HostingEnvironment.ApplicationID}", null);
+                ad.SetData($"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}", null);
         }
 
         /// <summary>

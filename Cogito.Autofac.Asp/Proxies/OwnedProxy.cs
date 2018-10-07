@@ -9,6 +9,7 @@ namespace Cogito.Autofac.Asp.Proxies
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [ComVisible(true)]
+    [Guid("9FF5DCD7-F2D4-4B5B-90E2-075C9E37D18E")]
     public class OwnedProxy :
         IDisposable
     {

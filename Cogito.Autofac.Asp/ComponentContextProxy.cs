@@ -12,6 +12,7 @@ namespace Cogito.Autofac.Asp
     /// <summary>
     /// Provides an interface to the Autofac component context.
     /// </summary>
+    [Guid("7E6EA822-67B7-4245-9F47-024F5057C293")]
     class ComponentContextProxy : MarshalByRefObject
     {
 

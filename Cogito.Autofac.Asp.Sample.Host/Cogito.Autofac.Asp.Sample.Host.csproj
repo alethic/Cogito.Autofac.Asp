@@ -30,9 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Cogito.COM.MsBuild" Version="0.1.0-unstable0003" />
     <PackageReference Include="Cogito.HostedWebCore" Version="1.1.0" />
-    <PackageReference Include="FileAndServe.MSBuild.COM" Version="0.1.0-unstable0069" />
-    <PackageReference Include="FileAndServe.MSBuild.WebImport" Version="0.1.0-unstable0069" />
   </ItemGroup>
 
   <ItemGroup>

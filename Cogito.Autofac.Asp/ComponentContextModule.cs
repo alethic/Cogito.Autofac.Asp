@@ -104,9 +104,10 @@ namespace Cogito.Autofac.Asp
             }
 
             // clear reference to this application in the default app domain
+            var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
             new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
-            if (adv is AppDomain ad && ad.IsDefaultAppDomain())
-                ad.SetData($"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}", null);
+            if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) != null)
+                ad.SetData(appDomainKey, null);
         }
 
         /// <summary>
@@ -121,9 +122,10 @@ namespace Cogito.Autofac.Asp
             rootProxyObjRef = RemotingServices.Marshal(rootProxy);
 
             // store reference to this application in the default app domain
+            var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
             new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
             if (adv is AppDomain ad && ad.IsDefaultAppDomain())
-                ad.SetData($"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}", rootProxyObjRef);
+                ad.SetData(appDomainKey, rootProxyObjRef);
 
             context.AddOnBeginRequestAsync(BeginOnBeginRequestAsync, EndOnBeginRequestAsync);
             context.AddOnEndRequestAsync(BeginOnEndRequestAsync, EndOnEndRequestAsync);

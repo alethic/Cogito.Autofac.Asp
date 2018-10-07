@@ -15,11 +15,11 @@ The `Cogito.Autofac.Asp` project needs to be made available both to the AppDomai
 
 Usage is relatively simple. Edit your `global.asa` file to include `<object runat="server" scope="Application" id="ComponentContext" progid="Cogito.Autofac.Asp.ComponentContext"></object>`, which makes an application-wide instance available. You can then invoke `Resolve` or `ResolveApplication` on it:
 
-`
+```
 Dim obj
 Set obj = ComponentContext.ResolveApplication("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject, Cogito.Autofac.Asp.Sample.Objects")
 Dim val
 val = obj.Text
-`
+```
 
 Voila!

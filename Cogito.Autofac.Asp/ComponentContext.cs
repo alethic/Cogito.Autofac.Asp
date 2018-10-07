@@ -75,6 +75,20 @@ namespace Cogito.Autofac.Asp
         }
 
         /// <summary>
+        /// Resolves a owned service from the container.
+        /// </summary>
+        /// <param name="serviceTypeName"></param>
+        /// <returns></returns>
+        [return: MarshalAs(UnmanagedType.IUnknown)]
+        public object ResolveOwned(string serviceTypeName)
+        {
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
+
+            return ResolveFunc(proxy => proxy.ResolveOwned(serviceTypeName));
+        }
+
+        /// <summary>
         /// Resolves an object from the root container.
         /// </summary>
         /// <param name="serviceTypeName"></param>
@@ -114,6 +128,20 @@ namespace Cogito.Autofac.Asp
                 throw new ArgumentNullException(nameof(serviceTypeName));
 
             return ResolveApplicationFunc(proxy => proxy.ResolveNamed(serviceName, serviceTypeName));
+        }
+
+        /// <summary>
+        /// Resolves an object from the root container.
+        /// </summary>
+        /// <param name="serviceTypeName"></param>
+        /// <returns></returns>
+        [return: MarshalAs(UnmanagedType.IUnknown)]
+        public object ResolveApplicationOwned(string serviceTypeName)
+        {
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
+
+            return ResolveApplicationFunc(proxy => proxy.ResolveOwned(serviceTypeName));
         }
 
         /// <summary>

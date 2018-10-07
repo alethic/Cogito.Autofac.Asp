@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using Autofac;
 using Autofac.Features.OwnedInstances;
 
+using Cogito.Autofac.Asp.Proxies;
+
 namespace Cogito.Autofac.Asp
 {
 
@@ -84,7 +86,14 @@ namespace Cogito.Autofac.Asp
                 throw new ArgumentNullException(nameof(serviceTypeName));
 
             return ResolveFunc(serviceTypeName, (ctx, serviceType) =>
-                ctx.Resolve(typeof(Owned<>).MakeGenericType(serviceType)));
+            {
+                var value = ctx.Resolve(typeof(Owned<>).MakeGenericType(serviceType));
+                if (value == null)
+                    return null;
+
+                // wrap in COM compatible proxy
+                return new OwnedProxy((OwnedProxyInstance)Activator.CreateInstance(typeof(OwnedProxyInstance<>).MakeGenericType(serviceType), value));
+            });
         }
 
         /// <summary>

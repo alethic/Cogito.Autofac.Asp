@@ -16,6 +16,7 @@
         <WrapperTool>tlbimp</WrapperTool>
         <Lcid>0</Lcid>
         <Isolated>false</Isolated>
+        <EmbedInteropTypes>true</EmbedInteropTypes>
       </COMReference>
       <COMReference Include="ASPTypeLibrary.dll">
         <Guid>d97a6da0-a85c-11cf-83ae-00a0c90c2bd8</Guid>
@@ -24,6 +25,7 @@
         <WrapperTool>tlbimp</WrapperTool>
         <Lcid>0</Lcid>
         <Isolated>false</Isolated>
+        <EmbedInteropTypes>true</EmbedInteropTypes>
       </COMReference>
     </ItemGroup>
 

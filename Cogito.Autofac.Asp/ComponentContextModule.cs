@@ -104,7 +104,7 @@ namespace Cogito.Autofac.Asp
             }
 
             // clear reference to this application in the default app domain
-            new mscoree.CorRuntimeHostClass().GetDefaultDomain(out var adv);
+            new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
             if (adv is AppDomain ad && ad.IsDefaultAppDomain())
                 ad.SetData($"__COMCTXPROXYMODREF_{HostingEnvironment.ApplicationID}", null);
         }
@@ -121,7 +121,7 @@ namespace Cogito.Autofac.Asp
             rootProxyObjRef = RemotingServices.Marshal(rootProxy);
 
             // store reference to this application in the default app domain
-            new mscoree.CorRuntimeHostClass().GetDefaultDomain(out var adv);
+            new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
             if (adv is AppDomain ad && ad.IsDefaultAppDomain())
                 ad.SetData($"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}", rootProxyObjRef);
 

@@ -208,7 +208,7 @@ namespace Cogito.Autofac.Asp
             var ad = AppDomain.CurrentDomain;
             if (ad.IsDefaultAppDomain() == false)
             {
-                new mscoree.CorRuntimeHostClass().GetDefaultDomain(out var adv);
+                new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
                 if (adv is AppDomain ad2)
                     ad = ad2;
             }

@@ -19,29 +19,21 @@ namespace Cogito.Autofac.Asp.Sample.Host
         static string NormalizePath(string physicalPath)
         {
             if (physicalPath == null)
-            {
                 throw new ArgumentNullException(nameof(physicalPath));
-            }
 
             if (string.IsNullOrWhiteSpace(physicalPath))
-            {
                 throw new ArgumentException(nameof(physicalPath));
-            }
 
             // can contain environmental variables
             physicalPath = Environment.ExpandEnvironmentVariables(physicalPath);
 
             // path might be relative, make absolute
             if (Path.IsPathRooted(physicalPath) == false)
-            {
                 physicalPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), physicalPath);
-            }
 
             // has to exist
             if (Directory.Exists(physicalPath) == false)
-            {
                 Directory.CreateDirectory(physicalPath);
-            }
 
             return new Uri(physicalPath).LocalPath;
         }

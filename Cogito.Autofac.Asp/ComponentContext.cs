@@ -30,14 +30,64 @@ namespace Cogito.Autofac.Asp
         }
 
         /// <summary>
-        /// Resolves an object from the container.
+        /// Resolves a service from the container.
         /// </summary>
-        /// <param name="typeName"></param>
+        /// <param name="serviceTypeName"></param>
         /// <returns></returns>
         [return: MarshalAs(UnmanagedType.IUnknown)]
-        public object Resolve(string typeName)
+        public object Resolve(string serviceTypeName)
         {
-            var ptr = GetProxy().Resolve(typeName);
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
+
+            var ptr = GetProxy().Resolve(serviceTypeName);
+            if (ptr == IntPtr.Zero)
+                return null;
+
+            // resolve to RCW, which .Net can marshal correctly
+            var obj = Marshal.GetObjectForIUnknown(ptr);
+            Marshal.Release(ptr);
+
+            return obj;
+        }
+
+        /// <summary>
+        /// Resolves a service from the container.
+        /// </summary>
+        /// <param name="serviceTypeName"></param>
+        /// <returns></returns>
+        [return: MarshalAs(UnmanagedType.IUnknown)]
+        public object ResolveOptional(string serviceTypeName)
+        {
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
+
+            var ptr = GetProxy().ResolveOptional(serviceTypeName);
+            if (ptr == IntPtr.Zero)
+                return null;
+
+            // resolve to RCW, which .Net can marshal correctly
+            var obj = Marshal.GetObjectForIUnknown(ptr);
+            Marshal.Release(ptr);
+
+            return obj;
+        }
+
+        /// <summary>
+        /// Resolves a named service from the container.
+        /// </summary>
+        /// <param name="serviceTypeName"></param>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        [return: MarshalAs(UnmanagedType.IUnknown)]
+        public object ResolveNamed(string serviceName, string serviceTypeName)
+        {
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
+            if (serviceName == null)
+                throw new ArgumentNullException(nameof(serviceName));
+
+            var ptr = GetProxy().ResolveNamed(serviceName, serviceTypeName);
             if (ptr == IntPtr.Zero)
                 return null;
 
@@ -56,7 +106,56 @@ namespace Cogito.Autofac.Asp
         [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveApplication(string typeName)
         {
+            if (typeName == null)
+                throw new ArgumentNullException(nameof(typeName));
+
             var ptr = GetApplicationProxy().Resolve(typeName);
+            if (ptr == IntPtr.Zero)
+                return null;
+
+            // resolve to RCW, which .Net can marshal correctly
+            var obj = Marshal.GetObjectForIUnknown(ptr);
+            Marshal.Release(ptr);
+
+            return obj;
+        }
+
+        /// <summary>
+        /// Resolves an object from the root container.
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns></returns>
+        [return: MarshalAs(UnmanagedType.IUnknown)]
+        public object ResolveApplicationOptional(string typeName)
+        {
+            if (typeName == null)
+                throw new ArgumentNullException(nameof(typeName));
+
+            var ptr = GetApplicationProxy().ResolveOptional(typeName);
+            if (ptr == IntPtr.Zero)
+                return null;
+
+            // resolve to RCW, which .Net can marshal correctly
+            var obj = Marshal.GetObjectForIUnknown(ptr);
+            Marshal.Release(ptr);
+
+            return obj;
+        }
+
+        /// <summary>
+        /// Resolves an object from the root container.
+        /// </summary>
+        /// <param name="serviceTypeName"></param>
+        /// <returns></returns>
+        [return: MarshalAs(UnmanagedType.IUnknown)]
+        public object ResolveApplicationNamed(string serviceName, string serviceTypeName)
+        {
+            if (serviceName == null)
+                throw new ArgumentNullException(nameof(serviceName));
+            if (serviceTypeName == null)
+                throw new ArgumentNullException(nameof(serviceTypeName));
+
+            var ptr = GetApplicationProxy().ResolveNamed(serviceName, serviceTypeName);
             if (ptr == IntPtr.Zero)
                 return null;
 

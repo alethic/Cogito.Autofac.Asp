@@ -74,10 +74,35 @@ namespace Cogito.Autofac.Asp
             return Marshal.GetIUnknownForObject(service);
         }
 
+        /// <summary>
+        /// Retrieve a named service from the request context.
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <param name="serviceTypeName"></param>
+        /// <returns></returns>
+        public IntPtr ResolveNamed(string serviceName, string serviceTypeName)
+        {
+            var serviceType = Type.GetType(serviceTypeName);
+            if (serviceType == null)
+                throw new TypeLoadException($"Unable to locate '{serviceTypeName}'.");
+
+            var scope = context();
+            if (scope == null)
+                throw new InvalidOperationException("Could not resolve Autofac component context.");
+
+            var service = scope.ResolveNamed(serviceName, serviceType);
+            if (service == null)
+                return IntPtr.Zero;
+
+            // pointer to IUnknown on CCW
+            return Marshal.GetIUnknownForObject(service);
+        }
+
         public override object InitializeLifetimeService()
         {
             return transient ? base.InitializeLifetimeService() : null;
         }
 
     }
+
 }

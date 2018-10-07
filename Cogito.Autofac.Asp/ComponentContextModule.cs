@@ -63,7 +63,7 @@ namespace Cogito.Autofac.Asp
                 }
             }
 
-            throw new InvalidOperationException($"Cannot locate Autofac lifetime scope for the application. {nameof(ComponentContextModule)} requires the Autofac.Web package to be configured.");
+            return null;
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Cogito.Autofac.Asp
                 }
             }
 
-            throw new InvalidOperationException($"Cannot locate Autofac lifetime scope for the request. {nameof(ComponentContextModule)} requires the Autofac.Web package to be configured.");
+            return null;
         }
 
         /// <summary>
@@ -116,19 +116,23 @@ namespace Cogito.Autofac.Asp
         /// <param name="context"></param>
         public void Init(HttpApplication context)
         {
-            // connect the app domain proxy to the root container
-            var container = GetAutofacApplicationContext(context);
-            rootProxy = new ComponentContextProxy(() => container, false);
-            rootProxyObjRef = RemotingServices.Marshal(rootProxy);
+            // only enable if Autofac.Web is configured
+            if (context is IContainerProviderAccessor accessor)
+            {
+                // connect the app domain proxy to the root container
+                var container = GetAutofacApplicationContext(context);
+                rootProxy = new ComponentContextProxy(() => container, false);
+                rootProxyObjRef = RemotingServices.Marshal(rootProxy);
 
-            // store reference to this application in the default app domain
-            var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
-            new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
-            if (adv is AppDomain ad && ad.IsDefaultAppDomain())
-                ad.SetData(appDomainKey, rootProxyObjRef);
+                // store reference to this application in the default app domain
+                var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
+                new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
+                if (adv is AppDomain ad && ad.IsDefaultAppDomain())
+                    ad.SetData(appDomainKey, rootProxyObjRef);
 
-            context.AddOnBeginRequestAsync(BeginOnBeginRequestAsync, EndOnBeginRequestAsync);
-            context.AddOnEndRequestAsync(BeginOnEndRequestAsync, EndOnEndRequestAsync);
+                context.AddOnBeginRequestAsync(BeginOnBeginRequestAsync, EndOnBeginRequestAsync);
+                context.AddOnEndRequestAsync(BeginOnEndRequestAsync, EndOnEndRequestAsync);
+            }
         }
 
         /// <summary>

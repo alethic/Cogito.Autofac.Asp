@@ -31,6 +31,8 @@ namespace Cogito.Autofac.Asp
         IHttpModule
     {
 
+        const string ContextProxyItemKey = "COMCTXPROXYREF";
+
         static ComponentContextProxy rootProxy;
         static ObjRef rootProxyObjRef;
 
@@ -124,6 +126,7 @@ namespace Cogito.Autofac.Asp
                 ad.SetData($"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}", rootProxyObjRef);
 
             context.AddOnBeginRequestAsync(BeginOnBeginRequestAsync, EndOnBeginRequestAsync);
+            context.AddOnEndRequestAsync(BeginOnEndRequestAsync, EndOnEndRequestAsync);
         }
 
         /// <summary>
@@ -160,12 +163,17 @@ namespace Cogito.Autofac.Asp
             if (context == null)
                 return new CompletedAsyncResult(null, null);
 
-            // generate new proxy reference to current request context
-            var proxy = new ComponentContextProxy(() => GetAutofacRequestContext(context.ApplicationInstance), true);
+            // only generate for classic ASP requests
+            if (context.Request.CurrentExecutionFilePathExtension == ".asp")
+            {
+                // generate new proxy reference to current request context
+                var proxy = new ComponentContextProxy(() => GetAutofacRequestContext(context.ApplicationInstance), true);
 
-            // add serialized object ref into a header, reachable by classic ASP
-            var objRef = RemotingServices.Marshal(proxy, null, typeof(ComponentContextProxy));
-            context.Request.Headers.Add(ComponentContext.HeadersProxyItemKey, SerializeObjRef(objRef));
+                // add serialized object ref into a header, reachable by classic ASP
+                var objRef = RemotingServices.Marshal(proxy, null, typeof(ComponentContextProxy));
+                context.Request.Headers.Add(ComponentContext.HeadersProxyItemKey, SerializeObjRef(objRef));
+                context.Items.Add(ContextProxyItemKey, proxy);
+            }
 
             return new CompletedAsyncResult(null, null);
         }
@@ -179,6 +187,47 @@ namespace Cogito.Autofac.Asp
 
         }
 
+        /// <summary>
+        /// Invoked when the request is ending.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="cb"></param>
+        /// <param name="extraData"></param>
+        /// <returns></returns>
+        IAsyncResult BeginOnEndRequestAsync(object sender, EventArgs e, AsyncCallback cb, object extraData)
+        {
+            // ignore spurious calls
+            var context = HttpContext.Current;
+            if (context == null)
+                return new CompletedAsyncResult(null, null);
+
+            // did we store away a proxy for disconnection?
+            if (context.Items.Contains(ContextProxyItemKey))
+            {
+                var proxy = (ComponentContextProxy)context.Items[ContextProxyItemKey];
+                if (proxy != null)
+                {
+                    RemotingServices.Disconnect(proxy);
+                    context.Items.Remove(ContextProxyItemKey);
+                }
+            }
+
+            return new CompletedAsyncResult(null, null);
+        }
+
+        /// <summary>
+        /// Invoked when the request is ending.
+        /// </summary>
+        /// <param name="ar"></param>
+        void EndOnEndRequestAsync(IAsyncResult ar)
+        {
+
+        }
+
+        /// <summary>
+        /// Disposes of the instance.
+        /// </summary>
         public void Dispose()
         {
 

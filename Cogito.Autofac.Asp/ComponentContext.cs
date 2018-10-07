@@ -145,7 +145,7 @@ namespace Cogito.Autofac.Asp
         }
 
         /// <summary>
-        /// Shared implementation of resolution against the proxy.
+        /// Invokes the desired resolve method and appropriately wraps the result for COM.
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <param name="resolve"></param>
@@ -168,11 +168,21 @@ namespace Cogito.Autofac.Asp
             return obj;
         }
 
+        /// <summary>
+        /// Invokes the desired resolve method and appropriately wraps the result for COM.
+        /// </summary>
+        /// <param name="resolve"></param>
+        /// <returns></returns>
         object ResolveFunc(Func<ComponentContextProxy, IntPtr> resolve)
         {
             return ResolveWithProxyFunc(GetProxy(), resolve);
         }
 
+        /// <summary>
+        /// Invokes the desired resolve method and appropriately wraps the result for COM.
+        /// </summary>
+        /// <param name="resolve"></param>
+        /// <returns></returns>
         object ResolveApplicationFunc(Func<ComponentContextProxy, IntPtr> resolve)
         {
             return ResolveWithProxyFunc(GetApplicationProxy(), resolve);

@@ -231,6 +231,11 @@ namespace Cogito.Autofac.Asp
         }
 
         /// <summary>
+        /// Returns <c>true</c> if there is a current ASP Component Context proxy available.
+        /// </summary>
+        public bool CanGetProxy => GetProxy() != null;
+
+        /// <summary>
         /// Discovers the proxy by examining the request context.
         /// </summary>
         /// <returns></returns>

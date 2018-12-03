@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using Autofac;
+using Autofac.Core;
 using Autofac.Features.OwnedInstances;
 
 using Cogito.Autofac.Asp.Proxies;
@@ -109,6 +111,11 @@ namespace Cogito.Autofac.Asp
             var serviceType = Type.GetType(serviceTypeName);
             if (serviceType == null)
                 throw new TypeLoadException($"Unable to locate '{serviceTypeName}'.");
+
+            // attempt to scan repository for registration that might match based on type name
+            if (serviceType == null)
+                context().ComponentRegistry.Registrations
+                    .FirstOrDefault(i => i.Services.OfType<IServiceWithType>().Any(j => j.ServiceType.FullName == serviceTypeName));
 
             var scope = context();
             if (scope == null)

@@ -7,7 +7,7 @@ using Autofac.Integration.Web;
 namespace Cogito.Autofac.Asp.Sample
 {
 
-    public class Global : HttpApplication
+    public class Global : HttpApplication, IContainerProviderAccessor
     {
 
         class OwinContainerProvider : IContainerProvider
@@ -23,7 +23,7 @@ namespace Cogito.Autofac.Asp.Sample
 
         readonly IContainerProvider containerProvider = new OwinContainerProvider();
 
-        //IContainerProvider IContainerProviderAccessor.ContainerProvider => containerProvider;
+        IContainerProvider IContainerProviderAccessor.ContainerProvider => containerProvider;
 
     }
 

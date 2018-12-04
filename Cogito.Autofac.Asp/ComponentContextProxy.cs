@@ -108,18 +108,13 @@ namespace Cogito.Autofac.Asp
         /// <returns></returns>
         IntPtr ResolveFunc(string serviceTypeName, Func<IComponentContext, Type, object> resolve)
         {
-            var serviceType = Type.GetType(serviceTypeName);
-            if (serviceType == null)
-                throw new TypeLoadException($"Unable to locate '{serviceTypeName}'.");
-
-            // attempt to scan repository for registration that might match based on type name
-            if (serviceType == null)
-                context().ComponentRegistry.Registrations
-                    .FirstOrDefault(i => i.Services.OfType<IServiceWithType>().Any(j => j.ServiceType.FullName == serviceTypeName));
-
             var scope = context();
             if (scope == null)
                 throw new InvalidOperationException("Could not resolve Autofac component context. Ensure Autofac.Web has been configured and that your HttpAppliation instance implements IContainerProviderAccessor.");
+
+            var serviceType = ResolveServiceTypeName(scope, serviceTypeName);
+            if (serviceType == null)
+                throw new InvalidOperationException($"Could not resolve service type name '{serviceTypeName}'.");
 
             var service = resolve(scope, serviceType);
             if (service == null)
@@ -127,6 +122,31 @@ namespace Cogito.Autofac.Asp
 
             // pointer to IUnknown on CCW
             return Marshal.GetIUnknownForObject(service);
+        }
+
+        /// <summary>
+        /// Attempts to resolve the service type name.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="serviceTypeName"></param>
+        /// <returns></returns>
+        Type ResolveServiceTypeName(IComponentContext context, string serviceTypeName)
+        {
+            var serviceType = Type.GetType(serviceTypeName);
+            if (serviceType != null)
+                return serviceType;
+
+            // attempt to scan repository for registration that might match based on type name
+            serviceType = context.ComponentRegistry.Registrations
+                .SelectMany(i => i.Services)
+                .OfType<IServiceWithType>()
+                .Select(i => i.ServiceType)
+                .Where(j => j.FullName == serviceTypeName)
+                .FirstOrDefault();
+            if (serviceType != null)
+                return serviceType;
+
+            return null;
         }
 
         public override object InitializeLifetimeService()

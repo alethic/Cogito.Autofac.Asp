@@ -7,8 +7,8 @@
 
     <%
         Dim obj
-        Set obj = ComponentContext.Resolve("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject, Cogito.Autofac.Asp.Sample.Objects")
-        Set obj = ComponentContext.ResolveOwned("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject, Cogito.Autofac.Asp.Sample.Objects")
+        Set obj = ComponentContext.Resolve("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject")
+        Set obj = ComponentContext.ResolveOwned("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject")
         Dim val
         Set val = obj.Value
     %>

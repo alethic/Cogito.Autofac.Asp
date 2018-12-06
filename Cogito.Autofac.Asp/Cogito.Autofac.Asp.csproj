@@ -32,8 +32,11 @@
     <ItemGroup>
       <PackageReference Include="Autofac" Version="4.8.1" />
       <PackageReference Include="Autofac.Web" Version="4.0.0" />
-      <PackageReference Include="Cogito.COM.MsBuild" Version="0.1.0-unstable0003" />
-      <PackageReference Include="Cogito.Core" Version="2.0.0" />
+      <PackageReference Include="Cogito.COM.MsBuild" Version="0.1.0-alpha0009">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Cogito.Core" Version="3.0.0" />
       <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
       <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
       <PackageReference Include="WebActivatorEx" Version="2.2.0" />

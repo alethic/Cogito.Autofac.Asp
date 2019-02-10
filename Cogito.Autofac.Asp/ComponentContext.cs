@@ -150,7 +150,7 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceTypeName"></param>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveWithProxyFunc(ComponentContextProxy proxy, Func<ComponentContextProxy, IntPtr> resolve)
+        private object ResolveWithProxyFunc(ComponentContextProxy proxy, Func<ComponentContextProxy, IntPtr> resolve)
         {
             if (proxy == null)
                 throw new ArgumentNullException(nameof(proxy));
@@ -161,11 +161,16 @@ namespace Cogito.Autofac.Asp
             if (ptr == IntPtr.Zero)
                 return null;
 
-            // resolve to RCW, which .Net can marshal correctly
-            var obj = Marshal.GetObjectForIUnknown(ptr);
-            Marshal.Release(ptr);
+            try
+            {
+                // resolve to RCW, which .Net can marshal correctly
+                return Marshal.GetObjectForIUnknown(ptr);
+            }
+            finally
+            {
+                Marshal.Release(ptr);
+            }
 
-            return obj;
         }
 
         /// <summary>
@@ -173,7 +178,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveFunc(Func<ComponentContextProxy, IntPtr> resolve)
+        private object ResolveFunc(Func<ComponentContextProxy, IntPtr> resolve)
         {
             var proxy = GetProxy();
             if (proxy == null)
@@ -187,7 +192,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveApplicationFunc(Func<ComponentContextProxy, IntPtr> resolve)
+        private object ResolveApplicationFunc(Func<ComponentContextProxy, IntPtr> resolve)
         {
             var proxy = GetApplicationProxy();
             if (proxy == null)
@@ -200,7 +205,7 @@ namespace Cogito.Autofac.Asp
         /// Discovers the proxy by consulting the default AppDomain for the registered application.
         /// </summary>
         /// <returns></returns>
-        ComponentContextProxy GetApplicationProxy()
+        private ComponentContextProxy GetApplicationProxy()
         {
             var request = (IRequest)System.EnterpriseServices.ContextUtil.GetNamedProperty("Request");
             if (request == null)
@@ -239,7 +244,7 @@ namespace Cogito.Autofac.Asp
         /// Discovers the proxy by examining the request context.
         /// </summary>
         /// <returns></returns>
-        ComponentContextProxy GetProxy()
+        private ComponentContextProxy GetProxy()
         {
             var request = (IRequest)System.EnterpriseServices.ContextUtil.GetNamedProperty("Request");
             if (request == null)

@@ -150,7 +150,7 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceTypeName"></param>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        private object ResolveWithProxyFunc(ComponentContextProxy proxy, Func<ComponentContextProxy, IntPtr> resolve)
+        object ResolveWithProxyFunc(ComponentContextProxy proxy, Func<ComponentContextProxy, IntPtr> resolve)
         {
             if (proxy == null)
                 throw new ArgumentNullException(nameof(proxy));
@@ -178,7 +178,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        private object ResolveFunc(Func<ComponentContextProxy, IntPtr> resolve)
+        object ResolveFunc(Func<ComponentContextProxy, IntPtr> resolve)
         {
             var proxy = GetProxy();
             if (proxy == null)
@@ -192,7 +192,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        private object ResolveApplicationFunc(Func<ComponentContextProxy, IntPtr> resolve)
+        object ResolveApplicationFunc(Func<ComponentContextProxy, IntPtr> resolve)
         {
             var proxy = GetApplicationProxy();
             if (proxy == null)
@@ -205,7 +205,7 @@ namespace Cogito.Autofac.Asp
         /// Discovers the proxy by consulting the default AppDomain for the registered application.
         /// </summary>
         /// <returns></returns>
-        private ComponentContextProxy GetApplicationProxy()
+        ComponentContextProxy GetApplicationProxy()
         {
             var request = (IRequest)System.EnterpriseServices.ContextUtil.GetNamedProperty("Request");
             if (request == null)
@@ -244,7 +244,7 @@ namespace Cogito.Autofac.Asp
         /// Discovers the proxy by examining the request context.
         /// </summary>
         /// <returns></returns>
-        private ComponentContextProxy GetProxy()
+        ComponentContextProxy GetProxy()
         {
             var request = (IRequest)System.EnterpriseServices.ContextUtil.GetNamedProperty("Request");
             if (request == null)

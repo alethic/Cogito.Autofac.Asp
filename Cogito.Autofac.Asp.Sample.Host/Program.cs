@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-
+using Autofac;
 using Cogito.HostedWebCore;
 using Cogito.Web.Configuration;
 
@@ -64,7 +64,12 @@ namespace Cogito.Autofac.Asp.Sample.Host
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            var host = new AppHostBuilder()
+            var builder = new ContainerBuilder();
+            builder.RegisterAllAssemblyModules();
+            var container = builder.Build();
+
+            new AppHostBuilder()
+                .UseLogger(container.Resolve<Microsoft.Extensions.Logging.ILogger>())
                 .ConfigureWeb(GetManifestResource("Web.config"), h => h
                     .SystemWeb(w => w.Compilation(c => c.TempDirectory(GetTempPath("F")))))
                 .ConfigureApp(GetManifestResource("ApplicationHost.config"), h => h
@@ -76,15 +81,8 @@ namespace Cogito.Autofac.Asp.Sample.Host
                         .AddBinding("http", "*:41177:*")
                         .Application("/", a => a
                             .VirtualDirectory("/", v => v.UsePhysicalPath(NormalizePath(@"..\..\..\..\Cogito.Autofac.Asp.Sample"))))))
-                .Build();
-
-            host.Start();
-
-#if DEBUG
-            System.Console.ReadLine();
-#endif
-
-            host.Stop();
+                .Build()
+                .Run();
 
 #if DEBUG
             System.Console.ReadLine();

@@ -7,15 +7,12 @@
 
     <%
         Dim obj
-        Set obj = ComponentContext.Resolve("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject")
-        Set obj = ComponentContext.ResolveOwned("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject")
-        Dim val
-        Set val = obj.Value
+        Set obj = ComponentContext.Resolve("Cogito.Autofac.Asp.Sample.Objects.ResolvableObject, Cogito.Autofac.Asp.Sample.Objects")
     %>
 
     <br />
 
-    I resolved a .NET object from Autofac. The value is <%= val.Text %>.
+    I resolved a .NET object from Autofac. It should have an OWIN context available. The host value from it is '<%= obj.Host %>'.
 
 </body>
 </html>

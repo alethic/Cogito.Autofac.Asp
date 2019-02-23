@@ -1,7 +1,5 @@
 ﻿using Autofac;
 
-using Cogito.Autofac.Asp.Sample.Objects;
-
 using Microsoft.Owin;
 
 using Owin;
@@ -19,7 +17,7 @@ namespace Cogito.Autofac.Asp.Sample
         static Startup()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterType<ResolvableObject>();
+            builder.RegisterAllAssemblyModules();
             Container = builder.Build();
         }
 

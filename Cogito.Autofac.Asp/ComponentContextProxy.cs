@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Lifetime;
 
 using Autofac;
 using Autofac.Core;
@@ -149,9 +150,21 @@ namespace Cogito.Autofac.Asp
             return null;
         }
 
+        /// <summary>
+        /// Obtains a lifetime service object to control the lifetime policy for this instance.
+        /// </summary>
+        /// <returns></returns>
         public override object InitializeLifetimeService()
         {
-            return transient ? base.InitializeLifetimeService() : null;
+            // object should survive basically forever
+            if (transient == false)
+                return null;
+
+            var lifet = base.InitializeLifetimeService();
+            if (lifet is ILease lease)
+                lease.InitialLeaseTime = TimeSpan.FromMinutes(10);
+
+            return lifet;
         }
 
     }

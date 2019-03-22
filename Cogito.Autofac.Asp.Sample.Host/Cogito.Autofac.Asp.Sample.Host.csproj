@@ -31,7 +31,10 @@
 
   <ItemGroup>
     <PackageReference Include="Cogito.Autofac" Version="1.2.0" />
-    <PackageReference Include="Cogito.COM.MsBuild" Version="0.1.0-unstable0003" />
+    <PackageReference Include="Cogito.COM.MsBuild" Version="0.1.21">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Cogito.Extensions.Logging.Serilog" Version="1.1.0" />
     <PackageReference Include="Cogito.Extensions.Logging.Serilog.Autofac" Version="1.1.0" />
     <PackageReference Include="Cogito.HostedWebCore" Version="1.2.0" />

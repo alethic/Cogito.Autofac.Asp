@@ -32,7 +32,7 @@
     <ItemGroup>
       <PackageReference Include="Autofac" Version="4.8.1" />
       <PackageReference Include="Autofac.Web" Version="4.0.0" />
-      <PackageReference Include="Cogito.COM.MsBuild" Version="0.1.0-alpha0009">
+      <PackageReference Include="Cogito.COM.MsBuild" Version="0.1.21">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       </PackageReference>

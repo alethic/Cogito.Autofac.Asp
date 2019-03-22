@@ -33,6 +33,7 @@ namespace Cogito.Autofac.Asp
 
         const string ContextProxyItemKey = "COMCTXPROXYREF";
 
+        static readonly object rootSyncRoot = new object();
         static ComponentContextProxy rootProxy;
         static ObjRef rootProxyObjRef;
 
@@ -95,19 +96,22 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         public static void ApplicationShutdown()
         {
-            if (rootProxy != null)
+            lock (rootSyncRoot)
             {
-                // disconnect the app domain proxy
-                RemotingServices.Disconnect(rootProxy);
-                rootProxyObjRef = null;
-                rootProxy = null;
-            }
+                if (rootProxy != null)
+                {
+                    // disconnect the app domain proxy
+                    RemotingServices.Disconnect(rootProxy);
+                    rootProxyObjRef = null;
+                    rootProxy = null;
+                }
 
-            // clear reference to this application in the default app domain
-            var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
-            new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
-            if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) != null)
-                ad.SetData(appDomainKey, null);
+                // clear reference to this application in the default app domain
+                var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
+                new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
+                if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) != null)
+                    ad.SetData(appDomainKey, null);
+            }
         }
 
         /// <summary>
@@ -116,23 +120,33 @@ namespace Cogito.Autofac.Asp
         /// <param name="context"></param>
         public void Init(HttpApplication context)
         {
-            // only enable if Autofac.Web is configured
-            if (context is IContainerProviderAccessor accessor)
+            lock (rootSyncRoot)
             {
-                // connect the app domain proxy to the root container
-                var container = GetAutofacApplicationContext(context);
-                rootProxy = new ComponentContextProxy(() => container, false);
-                rootProxyObjRef = RemotingServices.Marshal(rootProxy);
+                if (rootProxy == null)
+                {
+                    lock (rootSyncRoot)
+                    {
+                        // only enable if Autofac.Web is configured
+                        if (context is IContainerProviderAccessor accessor)
+                        {
+                            // connect the app domain proxy to the root container
+                            var container = GetAutofacApplicationContext(context);
+                            rootProxy = new ComponentContextProxy(() => container, false);
+                            rootProxyObjRef = RemotingServices.Marshal(rootProxy);
 
-                // store reference to this application in the default app domain
-                var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
-                new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
-                if (adv is AppDomain ad && ad.IsDefaultAppDomain())
-                    ad.SetData(appDomainKey, rootProxyObjRef);
-
-                context.AddOnBeginRequestAsync(BeginOnBeginRequestAsync, EndOnBeginRequestAsync);
-                context.AddOnEndRequestAsync(BeginOnEndRequestAsync, EndOnEndRequestAsync);
+                            // store reference to this application in the default app domain
+                            var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
+                            new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
+                            if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) == null)
+                                ad.SetData(appDomainKey, rootProxyObjRef);
+                        }
+                    }
+                }
             }
+
+            // register request events for context
+            context.AddOnBeginRequestAsync(BeginOnBeginRequestAsync, EndOnBeginRequestAsync);
+            context.AddOnEndRequestAsync(BeginOnEndRequestAsync, EndOnEndRequestAsync);
         }
 
         /// <summary>

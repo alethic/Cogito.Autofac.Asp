@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Lifetime;
 
 using Autofac;
 using Autofac.Core;
@@ -26,11 +25,9 @@ namespace Cogito.Autofac.Asp
         /// Initializes a new instance.
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="transient"></param>
-        public ComponentContextProxy(Func<IComponentContext> context, bool transient)
+        public ComponentContextProxy(Func<IComponentContext> context)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
-            this.transient = transient;
         }
 
         /// <summary>
@@ -156,15 +153,7 @@ namespace Cogito.Autofac.Asp
         /// <returns></returns>
         public override object InitializeLifetimeService()
         {
-            // object should survive basically forever
-            if (transient == false)
-                return null;
-
-            var lifet = base.InitializeLifetimeService();
-            if (lifet is ILease lease)
-                lease.InitialLeaseTime = TimeSpan.FromMinutes(10);
-
-            return lifet;
+            return null;
         }
 
     }

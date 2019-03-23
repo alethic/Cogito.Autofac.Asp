@@ -2,6 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.Remoting;
+using System.Runtime.Remoting.Lifetime;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Web;
 using System.Web.Hosting;
@@ -131,7 +132,7 @@ namespace Cogito.Autofac.Asp
                         {
                             // connect the app domain proxy to the root container
                             var container = GetAutofacApplicationContext(context);
-                            rootProxy = new ComponentContextProxy(() => container, false);
+                            rootProxy = new ComponentContextProxy(() => container);
                             rootProxyObjRef = RemotingServices.Marshal(rootProxy);
 
                             // store reference to this application in the default app domain
@@ -187,7 +188,7 @@ namespace Cogito.Autofac.Asp
             if (context.Request.CurrentExecutionFilePathExtension == ".asp")
             {
                 // generate new proxy reference to current request context
-                var proxy = new ComponentContextProxy(() => GetAutofacRequestContext(context.ApplicationInstance), true);
+                var proxy = new ComponentContextProxy(() => GetAutofacRequestContext(context.ApplicationInstance));
 
                 // add serialized object ref into a header, reachable by classic ASP
                 var objRef = RemotingServices.Marshal(proxy, null, typeof(ComponentContextProxy));

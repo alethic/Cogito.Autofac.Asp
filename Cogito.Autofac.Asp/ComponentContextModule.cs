@@ -1,9 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.IO.Compression;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Lifetime;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.Hosting;
 
@@ -32,11 +28,10 @@ namespace Cogito.Autofac.Asp
         IHttpModule
     {
 
-        const string ContextProxyItemKey = "COMCTXPROXYREF";
+        const string ContextProxyPtrItemKey = "COMCTXPROXYPTR";
 
         static readonly object rootSyncRoot = new object();
-        static ComponentContextProxy rootProxy;
-        static ObjRef rootProxyObjRef;
+        static bool init = true;
 
         /// <summary>
         /// Invoked before the application starts.
@@ -97,21 +92,23 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         public static void ApplicationShutdown()
         {
-            lock (rootSyncRoot)
+            if (init)
             {
-                if (rootProxy != null)
+                lock (rootSyncRoot)
                 {
-                    // disconnect the app domain proxy
-                    RemotingServices.Disconnect(rootProxy);
-                    rootProxyObjRef = null;
-                    rootProxy = null;
-                }
+                    if (init)
+                    {
+                        var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
+                        new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
+                        if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) is IntPtr ptr)
+                        {
+                            Marshal.Release(ptr);
+                            ad.SetData(appDomainKey, null);
+                        }
 
-                // clear reference to this application in the default app domain
-                var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
-                new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
-                if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) != null)
-                    ad.SetData(appDomainKey, null);
+                        init = false;
+                    }
+                }
             }
         }
 
@@ -123,50 +120,24 @@ namespace Cogito.Autofac.Asp
         {
             lock (rootSyncRoot)
             {
-                if (rootProxy == null)
+                // only enable if Autofac.Web is configured
+                if (context is IContainerProviderAccessor accessor)
                 {
-                    lock (rootSyncRoot)
-                    {
-                        // only enable if Autofac.Web is configured
-                        if (context is IContainerProviderAccessor accessor)
-                        {
-                            // connect the app domain proxy to the root container
-                            var container = GetAutofacApplicationContext(context);
-                            rootProxy = new ComponentContextProxy(() => container);
-                            rootProxyObjRef = RemotingServices.Marshal(rootProxy);
+                    // connect the app domain proxy to the root container
+                    var container = GetAutofacApplicationContext(context);
+                    var rootProxy = new ComponentContextProxy(() => container);
 
-                            // store reference to this application in the default app domain
-                            var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
-                            new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
-                            if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) == null)
-                                ad.SetData(appDomainKey, rootProxyObjRef);
-                        }
-                    }
+                    // store reference to this application in the default app domain
+                    var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
+                    new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
+                    if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) == null)
+                        ad.SetData(appDomainKey, Marshal.GetIUnknownForObject(rootProxy));
                 }
             }
 
             // register request events for context
             context.AddOnBeginRequestAsync(BeginOnBeginRequestAsync, EndOnBeginRequestAsync);
             context.AddOnEndRequestAsync(BeginOnEndRequestAsync, EndOnEndRequestAsync);
-        }
-
-        /// <summary>
-        /// Serializes the ObjRef to a base64 encoded string.
-        /// </summary>
-        /// <param name="objRef"></param>
-        /// <returns></returns>
-        string SerializeObjRef(ObjRef objRef)
-        {
-            using (var stm = new MemoryStream())
-            using (var cmp = new DeflateStream(stm, CompressionMode.Compress, true))
-            {
-                var srs = new BinaryFormatter();
-                srs.Serialize(cmp, objRef);
-                cmp.Flush();
-                cmp.Dispose();
-                stm.Position = 0;
-                return Convert.ToBase64String(stm.ToArray());
-            }
         }
 
         /// <summary>
@@ -191,9 +162,9 @@ namespace Cogito.Autofac.Asp
                 var proxy = new ComponentContextProxy(() => GetAutofacRequestContext(context.ApplicationInstance));
 
                 // add serialized object ref into a header, reachable by classic ASP
-                var objRef = RemotingServices.Marshal(proxy, null, typeof(ComponentContextProxy));
-                context.Request.Headers.Add(ComponentContext.HeadersProxyItemKey, SerializeObjRef(objRef));
-                context.Items.Add(ContextProxyItemKey, proxy);
+                var intPtr = Marshal.GetIUnknownForObject(proxy);
+                context.Request.Headers.Add(ComponentContext.HeadersProxyItemKey, intPtr.ToInt64().ToString("X"));
+                context.Items.Add(ContextProxyPtrItemKey, intPtr);
             }
 
             return new CompletedAsyncResult(null, null);
@@ -223,15 +194,11 @@ namespace Cogito.Autofac.Asp
             if (context == null)
                 return new CompletedAsyncResult(null, null);
 
-            // did we store away a proxy for disconnection?
-            if (context.Items.Contains(ContextProxyItemKey))
+            // release stored pointer
+            if (context.Items[ContextProxyPtrItemKey] is IntPtr ptr)
             {
-                var proxy = (ComponentContextProxy)context.Items[ContextProxyItemKey];
-                if (proxy != null)
-                {
-                    RemotingServices.Disconnect(proxy);
-                    context.Items.Remove(ContextProxyItemKey);
-                }
+                Marshal.Release(ptr);
+                context.Items.Remove(ContextProxyPtrItemKey);
             }
 
             return new CompletedAsyncResult(null, null);

@@ -14,12 +14,13 @@ namespace Cogito.Autofac.Asp
     /// <summary>
     /// Provides an interface to the Autofac component context.
     /// </summary>
+    [ComVisible(true)]
     [Guid("7E6EA822-67B7-4245-9F47-024F5057C293")]
-    class ComponentContextProxy : MarshalByRefObject
+    [ClassInterface(ClassInterfaceType.None)]
+    public class ComponentContextProxy : IComponentContextProxy
     {
 
         readonly Func<IComponentContext> context;
-        readonly bool transient;
 
         /// <summary>
         /// Initializes a new instance.
@@ -144,15 +145,6 @@ namespace Cogito.Autofac.Asp
             if (serviceType != null)
                 return serviceType;
 
-            return null;
-        }
-
-        /// <summary>
-        /// Obtains a lifetime service object to control the lifetime policy for this instance.
-        /// </summary>
-        /// <returns></returns>
-        public override object InitializeLifetimeService()
-        {
             return null;
         }
 

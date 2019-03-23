@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.IO.Compression;
+using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting;
-using System.Runtime.Serialization.Formatters.Binary;
 
 using ASPTypeLibrary;
 
@@ -13,13 +10,14 @@ namespace Cogito.Autofac.Asp
     /// <summary>
     /// COM-accessible proxy to the Autofac <see cref="IComponentContext"/>.
     /// </summary>
+    [ComVisible(true)]
     [Guid("85CF09B0-725D-4194-87E1-CC27578335E1")]
     [ProgId("Cogito.Autofac.Asp.ComponentContext")]
     public class ComponentContext
     {
 
-        public static readonly string AppDomainItemPrefix = "__COMCTXPROXYREF::";
-        public static readonly string HeadersProxyItemKey = "COMCTXPROXYREF";
+        public static readonly string AppDomainItemPrefix = "__COMCTXPROXYPTR::";
+        public static readonly string HeadersProxyItemKey = "COMCTXPROXYPTR";
 
         /// <summary>
         /// Initializes a new instance.
@@ -150,7 +148,7 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceTypeName"></param>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveWithProxyFunc(ComponentContextProxy proxy, Func<ComponentContextProxy, IntPtr> resolve)
+        object ResolveWithProxyFunc(IComponentContextProxy proxy, Func<IComponentContextProxy, IntPtr> resolve)
         {
             if (proxy == null)
                 throw new ArgumentNullException(nameof(proxy));
@@ -178,7 +176,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveFunc(Func<ComponentContextProxy, IntPtr> resolve)
+        object ResolveFunc(Func<IComponentContextProxy, IntPtr> resolve)
         {
             var proxy = GetProxy();
             if (proxy == null)
@@ -192,7 +190,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveApplicationFunc(Func<ComponentContextProxy, IntPtr> resolve)
+        object ResolveApplicationFunc(Func<IComponentContextProxy, IntPtr> resolve)
         {
             var proxy = GetApplicationProxy();
             if (proxy == null)
@@ -205,7 +203,7 @@ namespace Cogito.Autofac.Asp
         /// Discovers the proxy by consulting the default AppDomain for the registered application.
         /// </summary>
         /// <returns></returns>
-        ComponentContextProxy GetApplicationProxy()
+        IComponentContextProxy GetApplicationProxy()
         {
             var request = (IRequest)System.EnterpriseServices.ContextUtil.GetNamedProperty("Request");
             if (request == null)
@@ -227,12 +225,12 @@ namespace Cogito.Autofac.Asp
             }
 
             // find our remote reference
-            var objRef = (ObjRef)ad.GetData($"{AppDomainItemPrefix}{applMdPath}");
-            if (objRef == null)
-                throw new InvalidOperationException("Could not locate ObjRef of remote global LN environment proxy.");
+            var intPtr = (IntPtr?)ad.GetData($"{AppDomainItemPrefix}{applMdPath}") ?? IntPtr.Zero;
+            if (intPtr == IntPtr.Zero)
+                throw new InvalidOperationException("Could not locate IntPtr of remote global LN environment proxy.");
 
-            var aspNetProxy = (ComponentContextProxy)RemotingServices.Unmarshal(objRef);
-            return aspNetProxy;
+            var proxy = (IComponentContextProxy)Marshal.GetObjectForIUnknown(intPtr);
+            return proxy;
         }
 
         /// <summary>
@@ -244,7 +242,7 @@ namespace Cogito.Autofac.Asp
         /// Discovers the proxy by examining the request context.
         /// </summary>
         /// <returns></returns>
-        ComponentContextProxy GetProxy()
+        IComponentContextProxy GetProxy()
         {
             var request = (IRequest)System.EnterpriseServices.ContextUtil.GetNamedProperty("Request");
             if (request == null)
@@ -252,18 +250,18 @@ namespace Cogito.Autofac.Asp
 
             // unique ID for the request
             var variables = (IStringList)request.ServerVariables["HTTP_" + HeadersProxyItemKey];
-            var objRefEnc = variables?.Count >= 1 ? (string)variables[1] : null;
-            if (objRefEnc == null)
+            var intPtrEnc = variables?.Count >= 1 ? (string)variables[1] : null;
+            if (intPtrEnc == null || string.IsNullOrWhiteSpace(intPtrEnc))
                 return null;
 
-            // deserialize proxy reference and connect
-            using (var stm = new MemoryStream(Convert.FromBase64String(objRefEnc)))
-            using (var cmp = new DeflateStream(stm, CompressionMode.Decompress))
-            {
-                var srs = new BinaryFormatter();
-                var aspNetProxy = (ComponentContextProxy)srs.Deserialize(cmp);
-                return aspNetProxy;
-            }
+            // decode pointer to proxy
+            var intPtr = new IntPtr(long.Parse(intPtrEnc, NumberStyles.HexNumber));
+            if (intPtr == IntPtr.Zero)
+                return null;
+
+            // get reference to proxy
+            var proxy = (IComponentContextProxy)Marshal.GetObjectForIUnknown(intPtr);
+            return proxy;
         }
 
     }

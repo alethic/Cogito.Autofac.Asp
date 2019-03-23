@@ -10,13 +10,13 @@ namespace Cogito.Autofac.Asp
     public interface IComponentContextProxy
     {
 
-        IntPtr Resolve(string serviceTypeName);
+        object Resolve(string serviceTypeName);
 
-        IntPtr ResolveNamed(string serviceName, string serviceTypeName);
+        object ResolveNamed(string serviceName, string serviceTypeName);
 
-        IntPtr ResolveOptional(string serviceTypeName);
+        object ResolveOptional(string serviceTypeName);
 
-        IntPtr ResolveOwned(string serviceTypeName);
+        object ResolveOwned(string serviceTypeName);
 
     }
 

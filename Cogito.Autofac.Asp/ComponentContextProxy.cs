@@ -36,7 +36,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public IntPtr Resolve(string serviceTypeName)
+        public object Resolve(string serviceTypeName)
         {
             if (serviceTypeName == null)
                 throw new ArgumentNullException(nameof(serviceTypeName));
@@ -50,7 +50,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public IntPtr ResolveOptional(string serviceTypeName)
+        public object ResolveOptional(string serviceTypeName)
         {
             if (serviceTypeName == null)
                 throw new ArgumentNullException(nameof(serviceTypeName));
@@ -65,7 +65,7 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceName"></param>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public IntPtr ResolveNamed(string serviceName, string serviceTypeName)
+        public object ResolveNamed(string serviceName, string serviceTypeName)
         {
             if (serviceName == null)
                 throw new ArgumentNullException(nameof(serviceName));
@@ -82,7 +82,7 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceName"></param>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public IntPtr ResolveOwned(string serviceTypeName)
+        public object ResolveOwned(string serviceTypeName)
         {
             if (serviceTypeName == null)
                 throw new ArgumentNullException(nameof(serviceTypeName));
@@ -105,7 +105,7 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceTypeName"></param>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        IntPtr ResolveFunc(string serviceTypeName, Func<IComponentContext, Type, object> resolve)
+        object ResolveFunc(string serviceTypeName, Func<IComponentContext, Type, object> resolve)
         {
             var scope = context();
             if (scope == null)
@@ -115,12 +115,7 @@ namespace Cogito.Autofac.Asp
             if (serviceType == null)
                 throw new InvalidOperationException($"Could not resolve service type name '{serviceTypeName}'.");
 
-            var service = resolve(scope, serviceType);
-            if (service == null)
-                return IntPtr.Zero;
-
-            // pointer to IUnknown on CCW
-            return Marshal.GetIUnknownForObject(service);
+            return resolve(scope, serviceType);
         }
 
         /// <summary>

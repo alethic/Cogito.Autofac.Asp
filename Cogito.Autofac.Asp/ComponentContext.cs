@@ -20,19 +20,10 @@ namespace Cogito.Autofac.Asp
         public static readonly string HeadersProxyItemKey = "COMCTXPROXYPTR";
 
         /// <summary>
-        /// Initializes a new instance.
-        /// </summary>
-        public ComponentContext()
-        {
-
-        }
-
-        /// <summary>
         /// Resolves a service from the container.
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        [return: MarshalAs(UnmanagedType.IUnknown)]
         public object Resolve(string serviceTypeName)
         {
             if (serviceTypeName == null)
@@ -46,7 +37,6 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveOptional(string serviceTypeName)
         {
             if (serviceTypeName == null)
@@ -61,7 +51,6 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceTypeName"></param>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveNamed(string serviceName, string serviceTypeName)
         {
             if (serviceName == null)
@@ -77,7 +66,6 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveOwned(string serviceTypeName)
         {
             if (serviceTypeName == null)
@@ -91,7 +79,6 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveApplication(string serviceTypeName)
         {
             if (serviceTypeName == null)
@@ -105,7 +92,6 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveApplicationOptional(string serviceTypeName)
         {
             if (serviceTypeName == null)
@@ -119,7 +105,6 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveApplicationNamed(string serviceName, string serviceTypeName)
         {
             if (serviceTypeName == null)
@@ -133,7 +118,6 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        [return: MarshalAs(UnmanagedType.IUnknown)]
         public object ResolveApplicationOwned(string serviceTypeName)
         {
             if (serviceTypeName == null)
@@ -148,27 +132,14 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceTypeName"></param>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveWithProxyFunc(IComponentContextProxy proxy, Func<IComponentContextProxy, IntPtr> resolve)
+        object ResolveWithProxyFunc(IComponentContextProxy proxy, Func<IComponentContextProxy, object> resolve)
         {
             if (proxy == null)
                 throw new ArgumentNullException(nameof(proxy));
             if (resolve == null)
                 throw new ArgumentNullException(nameof(resolve));
 
-            var ptr = resolve(proxy);
-            if (ptr == IntPtr.Zero)
-                return null;
-
-            try
-            {
-                // resolve to RCW, which .Net can marshal correctly
-                return Marshal.GetObjectForIUnknown(ptr);
-            }
-            finally
-            {
-                Marshal.Release(ptr);
-            }
-
+            return resolve(proxy);
         }
 
         /// <summary>
@@ -176,7 +147,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveFunc(Func<IComponentContextProxy, IntPtr> resolve)
+        object ResolveFunc(Func<IComponentContextProxy, object> resolve)
         {
             var proxy = GetProxy();
             if (proxy == null)
@@ -190,7 +161,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="resolve"></param>
         /// <returns></returns>
-        object ResolveApplicationFunc(Func<IComponentContextProxy, IntPtr> resolve)
+        object ResolveApplicationFunc(Func<IComponentContextProxy, object> resolve)
         {
             var proxy = GetApplicationProxy();
             if (proxy == null)
@@ -232,11 +203,6 @@ namespace Cogito.Autofac.Asp
             var proxy = (IComponentContextProxy)Marshal.GetObjectForIUnknown(intPtr);
             return proxy;
         }
-
-        /// <summary>
-        /// Returns <c>true</c> if there is a current ASP Component Context proxy available.
-        /// </summary>
-        public bool CanGetProxy => GetProxy() != null;
 
         /// <summary>
         /// Discovers the proxy by examining the request context.

@@ -98,7 +98,7 @@ namespace Cogito.Autofac.Asp
                 {
                     if (init)
                     {
-                        var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
+                        var appDomainKey = $"{ComponentContextUtil.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
                         new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
                         if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) is IntPtr ptr)
                         {
@@ -128,7 +128,7 @@ namespace Cogito.Autofac.Asp
                     var rootProxy = new ComponentContextProxy(() => container);
 
                     // store reference to this application in the default app domain
-                    var appDomainKey = $"{ComponentContext.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
+                    var appDomainKey = $"{ComponentContextUtil.AppDomainItemPrefix}{HostingEnvironment.ApplicationID}";
                     new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
                     if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) == null)
                         ad.SetData(appDomainKey, Marshal.GetIUnknownForObject(rootProxy));
@@ -163,7 +163,7 @@ namespace Cogito.Autofac.Asp
 
                 // add serialized object ref into a header, reachable by classic ASP
                 var intPtr = Marshal.GetIUnknownForObject(proxy);
-                context.Request.Headers.Add(ComponentContext.HeadersProxyItemKey, intPtr.ToInt64().ToString("X"));
+                context.Request.Headers.Add(ComponentContextUtil.HeadersProxyItemKey, intPtr.ToInt64().ToString("X"));
                 context.Items.Add(ContextProxyPtrItemKey, intPtr);
             }
 

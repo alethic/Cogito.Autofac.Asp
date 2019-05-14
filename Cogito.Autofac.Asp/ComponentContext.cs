@@ -18,7 +18,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public static object Resolve(string serviceTypeName)
+        public object Resolve(string serviceTypeName)
         {
             return ComponentContextUtil.Resolve(serviceTypeName);
         }
@@ -28,7 +28,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public static object ResolveOptional(string serviceTypeName)
+        public object ResolveOptional(string serviceTypeName)
         {
             return ComponentContextUtil.ResolveOptional(serviceTypeName);
         }
@@ -39,7 +39,7 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceTypeName"></param>
         /// <param name="serviceName"></param>
         /// <returns></returns>
-        public static object ResolveNamed(string serviceName, string serviceTypeName)
+        public object ResolveNamed(string serviceName, string serviceTypeName)
         {
             return ComponentContextUtil.ResolveNamed(serviceName, serviceTypeName);
         }
@@ -49,7 +49,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public static object ResolveOwned(string serviceTypeName)
+        public object ResolveOwned(string serviceTypeName)
         {
             return ComponentContextUtil.ResolveOwned(serviceTypeName);
         }
@@ -59,7 +59,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public static object ResolveApplication(string serviceTypeName)
+        public object ResolveApplication(string serviceTypeName)
         {
             return ComponentContextUtil.ResolveApplication(serviceTypeName);
         }
@@ -69,7 +69,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public static object ResolveApplicationOptional(string serviceTypeName)
+        public object ResolveApplicationOptional(string serviceTypeName)
         {
             return ComponentContextUtil.ResolveApplicationOptional(serviceTypeName);
         }
@@ -80,7 +80,7 @@ namespace Cogito.Autofac.Asp
         /// <param name="serviceName"></param>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public static object ResolveApplicationNamed(string serviceName, string serviceTypeName)
+        public object ResolveApplicationNamed(string serviceName, string serviceTypeName)
         {
             return ComponentContextUtil.ResolveApplicationNamed(serviceName, serviceTypeName);
         }
@@ -90,7 +90,7 @@ namespace Cogito.Autofac.Asp
         /// </summary>
         /// <param name="serviceTypeName"></param>
         /// <returns></returns>
-        public static object ResolveApplicationOwned(string serviceTypeName)
+        public object ResolveApplicationOwned(string serviceTypeName)
         {
             return ComponentContextUtil.ResolveApplicationOwned(serviceTypeName);
         }

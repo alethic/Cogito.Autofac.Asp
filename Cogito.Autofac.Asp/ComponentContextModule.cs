@@ -6,6 +6,7 @@ using System.Web.Hosting;
 using Autofac;
 using Autofac.Integration.Web;
 
+using Cogito.Collections;
 using Cogito.Threading;
 
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
@@ -28,7 +29,8 @@ namespace Cogito.Autofac.Asp
         IHttpModule
     {
 
-        const string ContextProxyPtrItemKey = "COMCTXPROXYPTR";
+        const string ContextProxyKey = "COMCTXPROXY";
+        const string DisposerActionKey = "COMCTXPROXYDISPOSER";
 
         static readonly object rootSyncRoot = new object();
         static bool init = true;
@@ -102,7 +104,9 @@ namespace Cogito.Autofac.Asp
                         new mscoree.CorRuntimeHost().GetDefaultDomain(out var adv);
                         if (adv is AppDomain ad && ad.IsDefaultAppDomain() && ad.GetData(appDomainKey) is IntPtr ptr)
                         {
-                            Marshal.Release(ptr);
+                            while (Marshal.Release(ptr) > 0)
+                                continue;
+
                             ad.SetData(appDomainKey, null);
                         }
 
@@ -141,6 +145,15 @@ namespace Cogito.Autofac.Asp
         }
 
         /// <summary>
+        /// Returns true if the given page is an ASP page.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        bool IsAspPage(HttpContext context) =>
+            string.Equals(context.Request.CurrentExecutionFilePathExtension, ".asp", StringComparison.OrdinalIgnoreCase);
+
+
+        /// <summary>
         /// Invoked when the request is beginning.
         /// </summary>
         /// <param name="sender"></param>
@@ -156,15 +169,22 @@ namespace Cogito.Autofac.Asp
                 return new CompletedAsyncResult(null, null);
 
             // only generate for classic ASP requests
-            if (context.Request.CurrentExecutionFilePathExtension == ".asp")
+            if (IsAspPage(context))
             {
                 // generate new proxy reference to current request context
                 var proxy = new ComponentContextProxy(() => GetAutofacRequestContext(context.ApplicationInstance));
+                context.Items[ContextProxyKey] = proxy;
 
                 // add serialized object ref into a header, reachable by classic ASP
                 var intPtr = Marshal.GetIUnknownForObject(proxy);
                 context.Request.Headers.Add(ComponentContextUtil.HeadersProxyItemKey, intPtr.ToInt64().ToString("X"));
-                context.Items.Add(ContextProxyPtrItemKey, intPtr);
+
+                // ensures that the reference is released if the context is abandoned
+                context.Items[DisposerActionKey] = new DisposableAction(() =>
+                {
+                    while (Marshal.Release(intPtr) > 0)
+                        continue;
+                });
             }
 
             return new CompletedAsyncResult(null, null);
@@ -194,11 +214,16 @@ namespace Cogito.Autofac.Asp
             if (context == null)
                 return new CompletedAsyncResult(null, null);
 
-            // release stored pointer
-            if (context.Items[ContextProxyPtrItemKey] is IntPtr ptr)
+            // only generate for classic ASP requests
+            if (IsAspPage(context))
             {
-                Marshal.Release(ptr);
-                context.Items.Remove(ContextProxyPtrItemKey);
+                // execute disposer
+                if (context.Items.GetOrDefault(DisposerActionKey) is IDisposable disposer)
+                    disposer.Dispose();
+
+                // remove items from context of possible
+                context.Items.Remove(ContextProxyKey);
+                context.Items.Remove(DisposerActionKey);
             }
 
             return new CompletedAsyncResult(null, null);

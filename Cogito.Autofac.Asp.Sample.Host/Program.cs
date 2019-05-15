@@ -78,7 +78,7 @@ namespace Cogito.Autofac.Asp.Sample.Host
                         .HttpCompression(c => c.Directory(GetTempPath("X"))))
                     .Site(1, s => s
                         .RemoveBindings()
-                        .AddBinding("http", "*:41177:*")
+                        .AddBinding("http", "*:40176:")
                         .Application("/", a => a
                             .VirtualDirectory("/", v => v.UsePhysicalPath(NormalizePath(@"..\..\..\..\Cogito.Autofac.Asp.Sample"))))))
                 .Build()

@@ -37,7 +37,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Cogito.Core" Version="3.0.0" />
-      <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
+      <PackageReference Include="Microsoft.Owin" Version="4.1.1" />
       <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
       <PackageReference Include="WebActivatorEx" Version="2.2.0" />
     </ItemGroup>

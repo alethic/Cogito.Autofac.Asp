@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Cogito.Autofac" Version="1.2.0" />
-    <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin" Version="4.2.2" />
   </ItemGroup>
 
 </Project>

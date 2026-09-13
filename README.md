@@ -23,3 +23,9 @@ val = obj.Text
 ```
 
 Voila!
+
+## Packages
+
+| Package | Version |
+| --- | --- |
+| [Cogito.Autofac.Asp](https://www.nuget.org/packages/Cogito.Autofac.Asp) | [![NuGet](https://img.shields.io/nuget/v/Cogito.Autofac.Asp.svg)](https://www.nuget.org/packages/Cogito.Autofac.Asp) |
